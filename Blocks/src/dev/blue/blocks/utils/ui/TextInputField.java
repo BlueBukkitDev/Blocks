@@ -70,7 +70,7 @@ public class TextInputField extends InputField {
 			pattern.draw(g);
 			if (this.text1.length() + this.text2.length() >= 1) {
 				if (this.font == null) {
-					g.setFont(new Font("Impact", 0, 14));
+					g.setFont(new Font("Arial", Font.PLAIN, 16));
 				} else {
 					g.setFont(this.font);
 				}
@@ -85,7 +85,7 @@ public class TextInputField extends InputField {
 				}
 			} else if (!isSelected()) {
 				if (this.font == null) {
-					g.setFont(new Font("Times New Roman", 2, 14));
+					g.setFont(new Font("Arial", Font.ITALIC, 14));
 				} else {
 					g.setFont(this.font);
 				}

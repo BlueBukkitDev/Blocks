@@ -15,6 +15,9 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 	public UIObject clickedObject;
 	private App app;
 	
+	private int xOffset;
+	private int yOffset;
+	
 	public MouseManager(App app) {
 		this.app = app;
 	}
@@ -30,9 +33,13 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		int xOffset = (int)e.getLocationOnScreen().getX() - (int)app.getWindow().getLocation().getX();//mouseCoord will always be larger than windowCoord
+		int yOffset = (int)e.getLocationOnScreen().getY() - (int)app.getWindow().getLocation().getY();
 		//alertUIObjectDown(e.getButton(), e.getPoint());
 		for(UIObject each:app.getUIRegistry().getObjects()) {
-			each.onMouseDown(e.getButton(), e.getPoint());
+			if(each.onMouseDown(e.getButton(), e.getPoint())) {
+				clickedObject = each;
+			}
 		}
 	}
 
@@ -55,7 +62,12 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		int windowX = (int)app.getWindow().getLocation().getX();
+		int mouseX = (int)e.getLocationOnScreen().getX();
+		int windowY = (int)app.getWindow().getLocation().getY();
+		int mouseY = (int)e.getLocationOnScreen().getY();
 		
+		app.getWindow().setLocation(mouseX + xOffset, mouseY + yOffset);
 	}
 
 	@Override

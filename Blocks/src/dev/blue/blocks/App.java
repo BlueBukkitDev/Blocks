@@ -2,12 +2,15 @@ package dev.blue.blocks;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 
 import dev.blue.blocks.utils.Fonts;
 import dev.blue.blocks.utils.KeyManager;
 import dev.blue.blocks.utils.MouseManager;
 import dev.blue.blocks.utils.SimplePoint;
+import dev.blue.blocks.utils.ui.Button;
 import dev.blue.blocks.utils.ui.Pattern;
 import dev.blue.blocks.utils.ui.Shape;
 import dev.blue.blocks.utils.ui.TextArea;
@@ -51,15 +54,24 @@ public class App implements Runnable {
 				new SimplePoint(window.getWidth(), window.getHeight()), new SimplePoint(0, window.getHeight())));
 		msgBoardPattern.addShape(new Shape(Color.GRAY, new SimplePoint(0, 0), new SimplePoint(window.getWidth(), 0), new SimplePoint(window.getWidth(), window.getHeight()-28), new SimplePoint(0, window.getHeight()-28)));
 		
-		TextArea messageBoard = new TextArea(this, "msgBoard", 0, 0, window.getWidth(), window.getHeight()-28, 0, msgBoardPattern);
+		TextArea messageBoard = new TextArea(this, "msgBoard", 0, 0, window.getWidth(), window.getHeight()-28, 15, msgBoardPattern);
 		TextInputField messageField = new TextInputField(this, "message", 0, window.getHeight()-28, window.getWidth(), 28, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
 			@Override
 			public void onPrint() {
 				client.sendMessage(this.getText());
 			}
 		};
+		Button exitButton = new Button(this, "exit", true, false, 14, window.getWidth()-30, 0, 30, 30) {
+			@Override
+			public void runClick() {
+				client.close();
+				server.stop();
+				System.exit(0);
+			}
+		};
 		uiRegistry.registerObject(messageField);
 		uiRegistry.registerObject(messageBoard);
+		uiRegistry.registerObject(exitButton);
 	}
 	
 	public void sendMessage(String msg) {
@@ -91,11 +103,11 @@ public class App implements Runnable {
 			return;
 		}
 		Graphics g = bs.getDrawGraphics();
-		//if (g instanceof Graphics2D) {
-			//Graphics2D g2 = (Graphics2D) g;
-			//g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			//g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		//}
+		if (g instanceof Graphics2D) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		}
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, this.window.getWidth(), this.window.getHeight());
 		//render everything
@@ -122,7 +134,6 @@ public class App implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.exit(0);
 	}
 	
 	public UIObjectRegistry getUIRegistry() {
@@ -163,11 +174,11 @@ public class App implements Runnable {
 			return;
 		}
 		Graphics g = bs.getDrawGraphics();
-		/*if (g instanceof Graphics2D) {
+		if (g instanceof Graphics2D) {
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		}*/
+		}
 		//this.graphics = g;
 		g.dispose();
 		bs.show();

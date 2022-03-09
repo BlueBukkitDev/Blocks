@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -13,9 +12,9 @@ import java.util.List;
 import dev.blue.blocks.App;
 
 public class TextArea extends UIObject {
-	
+
 	private App app;
-	
+
 	private String id;
 
 	private Rectangle bounds;
@@ -39,7 +38,7 @@ public class TextArea extends UIObject {
 	private int cushion;
 
 	private boolean isActive;
-	
+
 	private Pattern pattern;
 
 	public TextArea(App app, String id, int x, int y, int width, int height, int cushion, Pattern pattern) {
@@ -81,97 +80,96 @@ public class TextArea extends UIObject {
 	}
 
 	public void logIncoming(String message) {
-    if (message.contains("§")) {///////////////////////Guess it was §, idk
-      TextBit[] bits = getBits(message);
-      if (this != null && 
-        bits != null)
-        addLine(bits); 
-    }else if(this!=null)
+		if (message.contains("§")) {/////////////////////// Guess it was §, idk
+			TextBit[] bits = getBits(message);
+			if (this != null && bits != null)
+				addLine(bits);
+		} else if (this != null)
 
-	{
-		addLine(new TextBit[] { new TextBit(app, Color.BLACK, (app.getFonts()).plain, message, null, null) });
-	}
+		{
+			addLine(new TextBit[] { new TextBit(app, Color.BLACK, (app.getFonts()).plain, message, null, null) });
+		}
 	}
 
 	private TextBit[] getBits(String message) {
-    String[] parts = message.split("§");////////////////////////////Prolly also is §
-    TextBit[] bits = new TextBit[parts.length];
-    for (int i = 1; i < parts.length; i++) {
-      TextBit bit;
-      if (parts[i].startsWith("a")) {
-        bit = new TextBit(app, new Color(0, 255, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("b")) {
-        bit = new TextBit(app, Color.CYAN, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("c")) {
-        bit = new TextBit(app, Color.RED, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("d")) {
-        bit = new TextBit(app, Color.PINK, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("e")) {
-        bit = new TextBit(app, Color.YELLOW, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("f")) {
-        bit = new TextBit(app, Color.WHITE, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("0")) {
-        bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("1")) {
-        bit = new TextBit(app, Color.BLUE, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("2")) {
-        bit = new TextBit(app, new Color(0, 80, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("3")) {
-        bit = new TextBit(app, new Color(0, 80, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("4")) {
-        bit = new TextBit(app, new Color(80, 0, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("5")) {
-        bit = new TextBit(app, new Color(80, 0, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("6")) {
-        bit = new TextBit(app, new Color(80, 0, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("7")) {
-        bit = new TextBit(app, Color.GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("8")) {
-        bit = new TextBit(app, Color.DARK_GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("9")) {
-        bit = new TextBit(app, new Color(80, 0, 200), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("l")) {
-        if (i > 1) {
-          bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).bold, parts[i].substring(1), null, null);
-        } else {
-          bit = new TextBit(app, Color.BLACK, (app.getFonts()).bold, parts[i].substring(1), null, null);
-        } 
-      } else if (parts[i].startsWith("i")) {
-        if (i > 1) {
-          bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).italic, parts[i].substring(1), null, null);
-        } else {
-          bit = new TextBit(app, Color.BLACK, (app.getFonts()).italic, parts[i].substring(1), null, null);
-        } 
-      } else if (parts[i].startsWith("r")) {
-        bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (i > 1) {
-        bit = new TextBit(app, bits[i - 1].getC(), bits[i - 1].getF(), parts[i], null, null);
-      } else {
-        bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, "§"+ parts[i], null, null);///////////////Also maybe a §
-      } 
-      bits[i] = bit;
-    } 
-    return bits;
-  }
+		String[] parts = message.split("§");//////////////////////////// Prolly also is §
+		TextBit[] bits = new TextBit[parts.length];
+		for (int i = 1; i < parts.length; i++) {
+			TextBit bit;
+			if (parts[i].startsWith("a")) {
+				bit = new TextBit(app, new Color(0, 255, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("b")) {
+				bit = new TextBit(app, Color.CYAN, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("c")) {
+				bit = new TextBit(app, Color.RED, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("d")) {
+				bit = new TextBit(app, Color.PINK, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("e")) {
+				bit = new TextBit(app, Color.YELLOW, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("f")) {
+				bit = new TextBit(app, Color.WHITE, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("0")) {
+				bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("1")) {
+				bit = new TextBit(app, Color.BLUE, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("2")) {
+				bit = new TextBit(app, new Color(0, 80, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("3")) {
+				bit = new TextBit(app, new Color(0, 80, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("4")) {
+				bit = new TextBit(app, new Color(80, 0, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("5")) {
+				bit = new TextBit(app, new Color(80, 0, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("6")) {
+				bit = new TextBit(app, new Color(80, 0, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("7")) {
+				bit = new TextBit(app, Color.GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("8")) {
+				bit = new TextBit(app, Color.DARK_GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("9")) {
+				bit = new TextBit(app, new Color(80, 0, 200), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("l")) {
+				if (i > 1) {
+					bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).bold, parts[i].substring(1), null, null);
+				} else {
+					bit = new TextBit(app, Color.BLACK, (app.getFonts()).bold, parts[i].substring(1), null, null);
+				}
+			} else if (parts[i].startsWith("i")) {
+				if (i > 1) {
+					bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).italic, parts[i].substring(1), null, null);
+				} else {
+					bit = new TextBit(app, Color.BLACK, (app.getFonts()).italic, parts[i].substring(1), null, null);
+				}
+			} else if (parts[i].startsWith("r")) {
+				bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (i > 1) {
+				bit = new TextBit(app, bits[i - 1].getC(), bits[i - 1].getF(), parts[i], null, null);
+			} else {
+				bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, "§" + parts[i], null, null);
+			}
+			bits[i] = bit;
+		}
+		return bits;
+	}
 
 	public void addLine(TextBit... bits) {
-    BitLine line = new BitLine(this.width - this.cushion * 2);
-    byte b;
-    int i;
-    TextBit[] arrayOfTextBit;
-    for (i = (arrayOfTextBit = bits).length, b = 0; b < i; ) {
-      TextBit each = arrayOfTextBit[b];
-      line.addBit(each);
-      b++;
-    } 
-    line.setY(this.lastLineY);
-    line.setX(this.x + this.cushion);
-    this.lastLineY += line.getHeight();
-    this.lines.add(line);
-  }
+		BitLine line = new BitLine(this.width - this.cushion * 2);
+		byte b;
+		int i;
+		TextBit[] arrayOfTextBit;
+		for (i = (arrayOfTextBit = bits).length, b = 0; b < i;) {
+			TextBit each = arrayOfTextBit[b];
+			line.addBit(each);
+			b++;
+		}
+		line.setY(this.lastLineY);
+		line.setX(this.x + this.cushion);
+		this.lastLineY += line.getHeight();
+		this.lines.add(line);
+	}
 
 	public void update() {
-		
+
 	}
 
 	public void onMouseMove(Point p) {
@@ -273,13 +271,13 @@ public class TextArea extends UIObject {
 	@Override
 	public void onType(KeyEvent paramKeyEvent) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onKeyPressed(KeyEvent paramKeyEvent) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
