@@ -28,17 +28,7 @@ public class TextArea extends UIObject {
 
 	private int height;
 
-	private BufferedImage[] images;
-
-	private BufferedImage frame;
-
-	private int frameIndex;
-
 	private boolean hovering = false;
-
-	private int aniSpeed = 0;
-
-	private int aniTimer = 0;
 
 	private List<BitLine> lines;
 
@@ -49,8 +39,10 @@ public class TextArea extends UIObject {
 	private int cushion;
 
 	private boolean isActive;
+	
+	private Pattern pattern;
 
-	public TextArea(App app, String id, int x, int y, int width, int height, int cushion) {
+	public TextArea(App app, String id, int x, int y, int width, int height, int cushion, Pattern pattern) {
 		this.app = app;
 		this.id = id;
 		this.x = x;
@@ -58,17 +50,17 @@ public class TextArea extends UIObject {
 		this.width = width;
 		this.height = height;
 		this.bounds = new Rectangle(x, y, width, height);
-		this.frame = this.images[0];
 		this.cushion = cushion;
 		this.lastLineY = y + cushion;
 		this.lines = new ArrayList<>();
 		this.isActive = true;
+		this.pattern = pattern;
 	}
 
 	public void render(Graphics g) {
 		if (this.isActive) {
 			this.g = g;
-			g.drawImage(this.frame, this.x, this.y, this.width, this.height, null);
+			this.pattern.draw(g);
 			try {
 				for (BitLine each : this.lines)
 					each.render(g);
@@ -179,7 +171,7 @@ public class TextArea extends UIObject {
   }
 
 	public void update() {
-		animate();
+		
 	}
 
 	public void onMouseMove(Point p) {
@@ -187,19 +179,6 @@ public class TextArea extends UIObject {
 			this.hovering = true;
 		} else {
 			this.hovering = false;
-		}
-	}
-
-	private void animate() {
-		if (this.aniSpeed > 0) {
-			this.aniTimer++;
-			if (this.aniTimer >= 1000 / this.aniSpeed) {
-				this.aniTimer = 0;
-				this.frameIndex++;
-				if (this.frameIndex > this.images.length)
-					this.frameIndex = 0;
-				this.frame = this.images[this.frameIndex];
-			}
 		}
 	}
 
@@ -260,14 +239,6 @@ public class TextArea extends UIObject {
 
 	public void setHeight(int height) {
 		this.height = height;
-	}
-
-	public BufferedImage[] getImages() {
-		return this.images;
-	}
-
-	public void setImages(BufferedImage[] images) {
-		this.images = images;
 	}
 
 	public boolean isHovering() {

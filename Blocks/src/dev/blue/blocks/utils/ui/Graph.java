@@ -61,7 +61,7 @@ public class Graph extends UIObject {
 		this.cushion = cushion;
 		this.lineColor = lineColor;
 		this.values = values;
-		this.infoPanel = new TextArea(app, "Info", x + width, animation.getY(), 1080 - x + width, animation.getHeight(), 0);
+		this.infoPanel = new TextArea(app, "Info", x + width, animation.getY(), 1080 - x + width, animation.getHeight(), 0, null);
 		setupDefaultInfoPanel();
 		app.getUIRegistry().registerObject(this.infoPanel);
 		this.pointSpacing = (width - cushion * 2) / (values.length - 1);

@@ -8,7 +8,6 @@ import dev.blue.blocks.utils.Fonts;
 import dev.blue.blocks.utils.KeyManager;
 import dev.blue.blocks.utils.MouseManager;
 import dev.blue.blocks.utils.SimplePoint;
-import dev.blue.blocks.utils.Textures;
 import dev.blue.blocks.utils.ui.Pattern;
 import dev.blue.blocks.utils.ui.Shape;
 import dev.blue.blocks.utils.ui.TextArea;
@@ -27,18 +26,19 @@ public class App implements Runnable {
 	private KeyManager keyManager;
 	private MouseManager mouseManager;
 	private Fonts fonts;
-	private Textures textures;
 	private UIObjectRegistry uiRegistry;
 	
 	public App() {
 		thread = new Thread(this);
 		server = new Server();
 		client = new Client();
+		fonts = new Fonts();
 		
-		keyManager = new KeyManager();
-		mouseManager = new MouseManager();
-		window = new Window("App", 700, 500);
+		keyManager = new KeyManager(this);
+		mouseManager = new MouseManager(this);
+		window = new Window(this, "App", 700, 500);
 		uiRegistry = new UIObjectRegistry();
+		setupPage();
 		initializeGraphics();
 		System.out.println("Client set up");
 		System.out.println("Server is running");
@@ -46,10 +46,13 @@ public class App implements Runnable {
 	
 	public void setupPage() {
 		Pattern msgFieldPattern = new Pattern();
-		msgFieldPattern.addShape(new Shape(Color.GRAY, new SimplePoint(0, window.getHeight()-30), new SimplePoint(window.getWidth(), window.getHeight()-30), 
+		Pattern msgBoardPattern = new Pattern();
+		msgFieldPattern.addShape(new Shape(Color.GRAY, new SimplePoint(0, window.getHeight()-28), new SimplePoint(window.getWidth(), window.getHeight()-28), 
 				new SimplePoint(window.getWidth(), window.getHeight()), new SimplePoint(0, window.getHeight())));
-		TextArea messageBoard = new TextArea(this, "msgBoard", 0, 0, window.getWidth(), window.getHeight()-30, 0);
-		TextInputField messageField = new TextInputField(this, "message", 0, window.getHeight()-30, window.getWidth(), 30, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
+		msgBoardPattern.addShape(new Shape(Color.GRAY, new SimplePoint(0, 0), new SimplePoint(window.getWidth(), 0), new SimplePoint(window.getWidth(), window.getHeight()-28), new SimplePoint(0, window.getHeight()-28)));
+		
+		TextArea messageBoard = new TextArea(this, "msgBoard", 0, 0, window.getWidth(), window.getHeight()-28, 0, msgBoardPattern);
+		TextInputField messageField = new TextInputField(this, "message", 0, window.getHeight()-28, window.getWidth(), 28, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
 			@Override
 			public void onPrint() {
 				client.sendMessage(this.getText());
@@ -73,10 +76,6 @@ public class App implements Runnable {
 	
 	public Fonts getFonts() {
 		return fonts;
-	}
-	
-	public Textures getTextures() {
-		return textures;
 	}
 	
 	public void render() {

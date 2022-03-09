@@ -17,7 +17,7 @@ public class Pattern {
 	public void draw(Graphics g) {
 		for(Shape each:shapes) {
 			g.setColor(each.getColor()); 
-			g.drawPolygon(each.getShape());
+			g.fillPolygon(each.getShape());
 		}
 	}
 }

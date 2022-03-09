@@ -6,15 +6,17 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import dev.blue.blocks.App;
 import dev.blue.blocks.utils.ui.UIObject;
 
 public class MouseManager implements MouseListener, MouseMotionListener, MouseWheelListener {
 	
 	//private UIObject currentObject;
 	public UIObject clickedObject;
+	private App app;
 	
-	public MouseManager() {
-		
+	public MouseManager(App app) {
+		this.app = app;
 	}
 	
 	@Override
@@ -29,11 +31,16 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 	@Override
 	public void mousePressed(MouseEvent e) {
 		//alertUIObjectDown(e.getButton(), e.getPoint());
+		for(UIObject each:app.getUIRegistry().getObjects()) {
+			each.onMouseDown(e.getButton(), e.getPoint());
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		//alertUIObjectUp(e.getButton(), e.getPoint());
+		for(UIObject each:app.getUIRegistry().getObjects()) {
+			each.onMouseUp(e.getButton(), e.getPoint());
+		}
 	}
 
 	@Override

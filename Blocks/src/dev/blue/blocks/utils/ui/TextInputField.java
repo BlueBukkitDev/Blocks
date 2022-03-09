@@ -67,7 +67,6 @@ public class TextInputField extends InputField {
 
 	public void render(Graphics g) {
 		if (this.visible) {
-			System.out.println("drawing pattern");
 			pattern.draw(g);
 			if (this.text1.length() + this.text2.length() >= 1) {
 				if (this.font == null) {
@@ -75,7 +74,7 @@ public class TextInputField extends InputField {
 				} else {
 					g.setFont(this.font);
 				}
-				g.setColor(Color.GREEN);
+				g.setColor(Color.BLACK);
 				if (this.protectedDisplay) {
 					String replacement = "";
 					for (int i = 0; i < this.displayText.length(); i++)
@@ -90,7 +89,7 @@ public class TextInputField extends InputField {
 				} else {
 					g.setFont(this.font);
 				}
-				g.setColor(Color.GREEN);
+				g.setColor(Color.BLACK);
 				g.drawString(this.preview, this.x + this.indent - 1, this.y + g.getFontMetrics().getHeight());
 			}
 			this.g = g;
@@ -98,7 +97,7 @@ public class TextInputField extends InputField {
 				if (this.timer >= 2 * this.blinkSpeed)
 					this.timer = 0;
 				if (this.timer <= this.blinkSpeed) {
-					g.setColor(Color.GREEN);
+					g.setColor(Color.BLACK);
 					g.fillRect(
 							this.x + g.getFontMetrics().stringWidth(this.displayText.substring(0, this.text1.length()))
 									+ this.indent - 1,

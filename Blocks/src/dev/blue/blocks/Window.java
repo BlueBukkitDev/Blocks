@@ -12,16 +12,19 @@ public class Window extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private App app;
 	private Dimension d;
 	public Canvas canvas;
 	
-	public Window(String title, int width, int height) {
-		d = new Dimension(width, height);
+	public Window(App app, String title, int width, int height) {
+		this.app = app;
+		this.d = new Dimension(width, height);
 		setupWindow(title);
 	}
 	
 	private void setupWindow(String title) {
 		this.setTitle(title);
+		this.setUndecorated(true);
 		this.setPreferredSize(d);
 		this.setMinimumSize(d);
 		this.setMaximumSize(d);
@@ -31,6 +34,17 @@ public class Window extends JFrame {
 		canvas.setMinimumSize(d);
 		canvas.setMaximumSize(d);
 		canvas.setSize(d);
+		
+		this.addMouseListener(app.getMouseManager());
+		this.addMouseMotionListener(app.getMouseManager());
+		this.addMouseWheelListener(app.getMouseManager());
+		canvas.addMouseListener(app.getMouseManager());
+		canvas.addMouseMotionListener(app.getMouseManager());
+		canvas.addMouseWheelListener(app.getMouseManager());
+		
+		this.addKeyListener(app.getKeyManager());
+		canvas.addKeyListener(app.getKeyManager());
+		
 		this.add(canvas);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);

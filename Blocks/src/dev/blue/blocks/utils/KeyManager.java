@@ -3,13 +3,21 @@ package dev.blue.blocks.utils;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import dev.blue.blocks.App;
+import dev.blue.blocks.utils.ui.UIObject;
+
 public class KeyManager implements KeyListener {
 	
-	public KeyManager() {
-		
+	private App app;
+	
+	public KeyManager(App app) {
+		this.app = app;
 	}
 	
 	public void keyPressed(KeyEvent e) {
+		for(UIObject each: app.getUIRegistry().getObjects()) {
+			each.onKeyPressed(e);
+		}
 		/*if (e.getKeyCode() == 32) {
 			engine.getBooleans().isUpKeyPressed = true;
 		} else if (e.getKeyCode() == 65) {
@@ -33,6 +41,9 @@ public class KeyManager implements KeyListener {
 	}
 
 	public void keyTyped(KeyEvent e) {
+		for(UIObject each: app.getUIRegistry().getObjects()) {
+			each.onType(e);
+		}
 		/*if(e.getKeyChar() == KeyEvent.VK_1) {
 			engine.getWorld().setTileType(100);
 		}else if(e.getKeyChar() == KeyEvent.VK_2) {
