@@ -112,48 +112,15 @@ public class App implements Runnable {
 				setPattern(exitButtonPattern);
 			}
 		};
-		
 		resizeButton = new Button(this, "Resize", false, false, 14, right-(cbW*2), top, cbW, cbW, resizeButtonPattern) {
 			@Override
 			public void runClick() {
 				if(!window.isSmall) {
 					window.resizeDown();
-					setupMeasurements();
-					setupCornerButtons();
-					setupCommsFields();
-					exitButton.setX(right-cbW);
-					exitButton.setY(top);
-					exitButton.setPattern(exitButtonPattern);
-					resizeButton.setX(right-(cbW*2));
-					resizeButton.setY(top);
-					resizeButton.setPattern(resizeButtonPattern);
-					messageField.setX(left);
-					messageField.setY(bottom-msgFieldHeight);
-					messageField.setWidth(right);
-					messageField.setPattern(msgFieldPattern);
-					messageBoard.setX(left);
-					messageBoard.setY(top);
-					messageBoard.setWidth(right);
-					messageBoard.setPattern(msgBoardPattern);
+					resetPage();
 				}else {
 					window.resizeUp();
-					setupMeasurements();
-					setupCornerButtons();
-					setupCommsFields();
-					exitButton.setX(right-cbW);
-					exitButton.setY(top);
-					exitButton.setPattern(exitButtonPattern);
-					resizeButton.setX(right-(cbW*2));
-					resizeButton.setY(top);
-					resizeButton.setPattern(resizeButtonPattern);
-					messageField.setX(left);
-					messageField.setY(bottom-msgFieldHeight);
-					messageField.setWidth(right);
-					messageField.setPattern(msgFieldPattern);
-					messageBoard.setX(left);
-					messageBoard.setY(top);
-					messageBoard.setWidth(right);
-					messageBoard.setPattern(msgBoardPattern);
+					resetPage();
 				}
 			}
 			
@@ -167,10 +134,31 @@ public class App implements Runnable {
 				setPattern(resizeButtonPattern);
 			}
 		};
+		
 		uiRegistry.registerObject(messageField);
 		uiRegistry.registerObject(messageBoard);
 		uiRegistry.registerObject(exitButton);
 		uiRegistry.registerObject(resizeButton);
+	}
+	
+	private void resetPage() {
+		setupMeasurements();
+		setupCornerButtons();
+		setupCommsFields();
+		exitButton.setX(right-cbW);
+		exitButton.setY(top);
+		exitButton.setPattern(exitButtonPattern);
+		resizeButton.setX(right-(cbW*2));
+		resizeButton.setY(top);
+		resizeButton.setPattern(resizeButtonPattern);
+		messageField.setX(left);
+		messageField.setY(bottom-msgFieldHeight);
+		messageField.setWidth(right);
+		messageField.setPattern(msgFieldPattern);
+		messageBoard.setX(left);
+		messageBoard.setY(top);
+		messageBoard.setWidth(right);
+		messageBoard.setPattern(msgBoardPattern);
 	}
 	
 	private void setupCommsFields() {

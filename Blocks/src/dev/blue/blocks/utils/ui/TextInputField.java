@@ -132,6 +132,7 @@ public class TextInputField extends InputField {
 	public boolean onClick(int button, Point p) {
 		if (this.visible) {
 			if (this.bounds.contains(p)) {
+				System.out.println("Clickety");
 				this.timer = 0;
 				if (this.writable) {
 					this.selected = true;
