@@ -2,6 +2,7 @@ package dev.blue.blocks;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 
@@ -16,9 +17,9 @@ public class Window extends JFrame {
 	private Dimension d;
 	public Canvas canvas;
 	
-	public Window(App app, String title, int width, int height) {
+	public Window(App app, String title) {
 		this.app = app;
-		this.d = new Dimension(width, height);
+		this.d = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
 		setupWindow(title);
 	}
 	
@@ -29,6 +30,7 @@ public class Window extends JFrame {
 		this.setMinimumSize(d);
 		this.setMaximumSize(d);
 		this.setSize(d);
+		this.setResizable(false);
 		this.canvas = new Canvas();
 		canvas.setPreferredSize(d);
 		canvas.setMinimumSize(d);

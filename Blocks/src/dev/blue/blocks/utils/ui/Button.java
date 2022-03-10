@@ -27,9 +27,11 @@ public class Button extends UIObject {
 	private int fontSize;
 
 	private Color color = Color.BLACK;
+	
+	private Pattern pattern;
 
 	public Button(App app, String id, boolean showID, boolean useTooltip, int fontSize, int x, int y, int width,
-			int height) {
+			int height, Pattern pattern) {
 		this.app = app;
 		this.id = id;
 		this.x = x;
@@ -40,9 +42,11 @@ public class Button extends UIObject {
 		this.showID = showID;
 		this.fontSize = fontSize;
 		this.useTooltip = useTooltip;
+		this.pattern = pattern;
 	}
 
 	public void render(Graphics g) {
+		pattern.draw(g);
 		if (this.showID) {
 			g.setFont(new Font("Helvetica", 1, this.fontSize));
 			g.setColor(this.color);
@@ -140,5 +144,9 @@ public class Button extends UIObject {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public void setPattern(Pattern pattern) {
+		this.pattern = pattern;
 	}
 }

@@ -71,11 +71,19 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 		int mouseY = (int)e.getLocationOnScreen().getY();
 		
 		app.getWindow().setLocation(mouseX - xOffset, mouseY - yOffset);
+		if(app.getWindow().getLocation().getX() < 0) {
+			app.getWindow().setLocation(0, (int)app.getWindow().getLocation().getY());
+		}
+		if(app.getWindow().getLocation().getY() < 0) {
+			app.getWindow().setLocation((int)app.getWindow().getLocation().getX(), 0);
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		
+		for(UIObject each:app.getUIRegistry().getObjects()) {
+			each.onMouseMove(e.getPoint());
+		}
 	}
 
 	@Override

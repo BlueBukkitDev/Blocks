@@ -31,7 +31,7 @@ public class TextArea extends UIObject {
 
 	private List<BitLine> lines;
 
-	private int lastLineY;
+	private int lastLineY = 0;
 
 	private Graphics g;
 
@@ -50,7 +50,6 @@ public class TextArea extends UIObject {
 		this.height = height;
 		this.bounds = new Rectangle(x, y, width, height);
 		this.cushion = cushion;
-		this.lastLineY = y + cushion;
 		this.lines = new ArrayList<>();
 		this.isActive = true;
 		this.pattern = pattern;
@@ -162,6 +161,9 @@ public class TextArea extends UIObject {
 			line.addBit(each);
 			b++;
 		}
+		if(lastLineY == 0) {
+			lastLineY = y+cushion+line.getHeight();
+		}
 		line.setY(this.lastLineY);
 		line.setX(this.x + this.cushion);
 		this.lastLineY += line.getHeight();
@@ -262,7 +264,7 @@ public class TextArea extends UIObject {
 	public void clear() {
 		try {
 			this.lines.clear();
-			this.lastLineY = this.y + this.cushion;
+			this.lastLineY = 0;
 		} catch (ConcurrentModificationException e) {
 			System.out.println("Caught a CCME!");
 		}
