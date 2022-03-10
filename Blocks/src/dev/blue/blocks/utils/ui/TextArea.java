@@ -10,6 +10,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 
 import dev.blue.blocks.App;
+import dev.blue.blocks.utils.ui.gfx.Pattern;
 
 public class TextArea extends UIObject {
 
@@ -299,5 +300,9 @@ public class TextArea extends UIObject {
 	public boolean onMouseUp(int paramInt, Point paramPoint) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public void setPattern(Pattern pattern) {
+		this.pattern = pattern;
 	}
 }

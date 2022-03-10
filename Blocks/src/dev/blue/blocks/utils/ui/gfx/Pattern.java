@@ -1,4 +1,4 @@
-package dev.blue.blocks.utils.ui;
+package dev.blue.blocks.utils.ui.gfx;
 
 import java.awt.Graphics;
 import java.util.ArrayList;

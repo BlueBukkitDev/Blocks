@@ -1,6 +1,7 @@
 package dev.blue.blocks.utils.ui;
 
 import dev.blue.blocks.App;
+import dev.blue.blocks.utils.ui.gfx.Pattern;
 
 public class NumberInputField extends TextInputField {
 	public NumberInputField(App app, String id, int x, int y, int width, int height, String preview, String value,

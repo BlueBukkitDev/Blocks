@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 
 import dev.blue.blocks.App;
+import dev.blue.blocks.utils.ui.gfx.Pattern;
 
 public class TextInputField extends InputField {
 
@@ -51,6 +52,8 @@ public class TextInputField extends InputField {
 	private TextArea toWriteTo;
 	
 	private Pattern pattern;
+	
+	private int lineHeight = 0;
 
 	public TextInputField(App app, String id, int x, int y, int width, int height, String preview, String value,
 			boolean writable, boolean protectedDisplay, TextArea toWriteTo, Pattern pattern) {
@@ -104,6 +107,7 @@ public class TextInputField extends InputField {
 							this.y + this.vertIndent, 2, this.height - this.vertIndent * 2);
 				}
 			}
+			this.lineHeight = g.getFontMetrics().getHeight();
 			this.timer++;
 		}
 	}
@@ -195,8 +199,7 @@ public class TextInputField extends InputField {
 
 	public void onType(KeyEvent e) {
 		if (this.visible) {
-			if (this.g.getFontMetrics().stringWidth(
-					String.valueOf(this.text1) + this.text2 + e.getKeyChar()) <= this.width - this.indent * 2) {
+			if (this.g.getFontMetrics().stringWidth(String.valueOf(this.text1) + this.text2 + e.getKeyChar()) <= this.width - this.indent * 2) {//if the width is not too wide
 				byte b;
 				int i;
 				char[] arrayOfChar;
@@ -210,6 +213,9 @@ public class TextInputField extends InputField {
 					}
 					b++;
 				}
+			}else {
+				this.setHeight(this.getHeight()+this.lineHeight);
+				this.setY(this.y-this.lineHeight);
 			}
 			if (e.getKeyChar() == '\b' && this.text1.length() > 0) {
 				this.text1 = this.text1.substring(0, this.text1.length() - 1);
@@ -360,5 +366,9 @@ public class TextInputField extends InputField {
 					return this.displayText.length();
 			}
 		return 0;
+	}
+	
+	public void setPattern(Pattern pattern) {
+		this.pattern = pattern;
 	}
 }

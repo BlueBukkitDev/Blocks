@@ -8,6 +8,7 @@ import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import dev.blue.blocks.App;
+import dev.blue.blocks.utils.ui.gfx.Pattern;
 
 public class Button extends UIObject {
 	private App app;

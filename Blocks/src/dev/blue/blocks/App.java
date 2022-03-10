@@ -11,11 +11,11 @@ import dev.blue.blocks.utils.KeyManager;
 import dev.blue.blocks.utils.MouseManager;
 import dev.blue.blocks.utils.SimplePoint;
 import dev.blue.blocks.utils.ui.Button;
-import dev.blue.blocks.utils.ui.Pattern;
-import dev.blue.blocks.utils.ui.Shape;
 import dev.blue.blocks.utils.ui.TextArea;
 import dev.blue.blocks.utils.ui.TextInputField;
 import dev.blue.blocks.utils.ui.UIObjectRegistry;
+import dev.blue.blocks.utils.ui.gfx.Pattern;
+import dev.blue.blocks.utils.ui.gfx.Shape;
 
 public class App implements Runnable {
 	private Thread thread;
@@ -31,6 +31,27 @@ public class App implements Runnable {
 	private Fonts fonts;
 	private UIObjectRegistry uiRegistry;
 	
+	private int cbW;
+	private int cbB;
+	private int bottom;
+	private int top;
+	private int left;
+	private int right;
+	private int msgFieldHeight;
+	private int spacer;
+	
+	private Pattern msgFieldPattern;
+	private Pattern msgBoardPattern;
+	private Pattern exitButtonPattern;
+	private Pattern exitButtonHoverPattern;
+	private Pattern resizeButtonPattern;
+	private Pattern resizeButtonHoverPattern;
+	
+	private TextArea messageBoard;
+	private TextInputField messageField;
+	private Button exitButton;
+	private Button resizeButton;
+	
 	public App() {
 		thread = new Thread(this);
 		server = new Server();
@@ -41,42 +62,39 @@ public class App implements Runnable {
 		mouseManager = new MouseManager(this);
 		window = new Window(this, "App");
 		uiRegistry = new UIObjectRegistry();
+		
+		setupMeasurements();
+		
 		setupPage();
 		initializeGraphics();
+		
 		System.out.println("Client set up");
 		System.out.println("Server is running");
 	}
 	
+	private void setupMeasurements() {
+		cbW = (int)(window.getScreenSize().getWidth()/80);
+		cbB = 2;
+		bottom = window.getHeight();
+		top = 0;
+		left = 0;
+		right = window.getWidth();
+		msgFieldHeight = 28;
+		spacer = 2;
+	}
+	
 	public void setupPage() {
-		Pattern msgFieldPattern = new Pattern();
-		Pattern msgBoardPattern = new Pattern();
-		Pattern exitButtonPattern = new Pattern();
-		Pattern exitButtonHoverPattern = new Pattern();
-		SimplePoint[] msgFieldPoints = new SimplePoint[] 
-			{new SimplePoint(0, window.getHeight()-28), new SimplePoint(window.getWidth(), window.getHeight()-28), new SimplePoint(window.getWidth(), window.getHeight()), new SimplePoint(0, window.getHeight())};
-		SimplePoint[] msgBoardPoints = new SimplePoint[]
-			{new SimplePoint(0, 0), new SimplePoint(window.getWidth(), 0), new SimplePoint(window.getWidth(), window.getHeight()-30), new SimplePoint(0, window.getHeight()-30)};
-		SimplePoint[] exitButtonFillPoints = new SimplePoint[]
-			{new SimplePoint(window.getWidth()-28, 2), new SimplePoint(window.getWidth()-2, 2), new SimplePoint(window.getWidth()-2, 28), new SimplePoint(window.getWidth()-28, 28)};
-		SimplePoint[] exitButtonBorderPoints = new SimplePoint[]
-			{new SimplePoint(window.getWidth()-30, 0), new SimplePoint(window.getWidth(), 0), new SimplePoint(window.getWidth(), 30), new SimplePoint(window.getWidth()-30, 30), 
-			 new SimplePoint(window.getWidth()-30, 2), new SimplePoint(window.getWidth()-28, 2), new SimplePoint(window.getWidth()-28, 28), new SimplePoint(window.getWidth()-2, 28),
-			 new SimplePoint(window.getWidth()-2, 2), new SimplePoint(window.getWidth()-30, 2)};
-		msgFieldPattern.addShape(new Shape(Color.GRAY, msgFieldPoints));
-		msgBoardPattern.addShape(new Shape(Color.GRAY, msgBoardPoints));
-		exitButtonPattern.addShape(new Shape(new Color(150, 0, 0), exitButtonFillPoints));
-		exitButtonPattern.addShape(new Shape(new Color(95, 0, 0), exitButtonBorderPoints));
-		exitButtonHoverPattern.addShape(new Shape(new Color(180, 60, 60), exitButtonFillPoints));
-		exitButtonHoverPattern.addShape(new Shape(new Color(95, 0, 0), exitButtonBorderPoints));
+		setupCornerButtons();
+		setupCommsFields();
 		
-		TextArea messageBoard = new TextArea(this, "msgBoard", 0, 0, window.getWidth(), window.getHeight()-28, 5, msgBoardPattern);
-		TextInputField messageField = new TextInputField(this, "message", 0, window.getHeight()-28, window.getWidth(), 28, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
+		messageBoard = new TextArea(this, "msgBoard", left, top, right, bottom-msgFieldHeight, 5, msgBoardPattern);
+		messageField = new TextInputField(this, "message", left, bottom-msgFieldHeight, right, msgFieldHeight, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
 			@Override
 			public void onPrint() {
 				client.sendMessage(this.getText());
 			}
 		};
-		Button exitButton = new Button(this, "X", true, false, 14, window.getWidth()-30, 0, 30, 30, exitButtonPattern) {
+		exitButton = new Button(this, "exit", false, false, 14, right-cbW, top, cbW, cbW, exitButtonPattern) {
 			@Override
 			public void runClick() {
 				client.close();
@@ -94,9 +112,104 @@ public class App implements Runnable {
 				setPattern(exitButtonPattern);
 			}
 		};
+		
+		resizeButton = new Button(this, "Resize", false, false, 14, right-(cbW*2), top, cbW, cbW, resizeButtonPattern) {
+			@Override
+			public void runClick() {
+				if(!window.isSmall) {
+					window.resizeDown();
+					setupMeasurements();
+					setupCornerButtons();
+					setupCommsFields();
+					exitButton.setX(right-cbW);
+					exitButton.setY(top);
+					exitButton.setPattern(exitButtonPattern);
+					resizeButton.setX(right-(cbW*2));
+					resizeButton.setY(top);
+					resizeButton.setPattern(resizeButtonPattern);
+					messageField.setX(left);
+					messageField.setY(bottom-msgFieldHeight);
+					messageField.setWidth(right);
+					messageField.setPattern(msgFieldPattern);
+					messageBoard.setX(left);
+					messageBoard.setY(top);
+					messageBoard.setWidth(right);
+					messageBoard.setPattern(msgBoardPattern);
+				}else {
+					window.resizeUp();
+					setupMeasurements();
+					setupCornerButtons();
+					setupCommsFields();
+					exitButton.setX(right-cbW);
+					exitButton.setY(top);
+					exitButton.setPattern(exitButtonPattern);
+					resizeButton.setX(right-(cbW*2));
+					resizeButton.setY(top);
+					resizeButton.setPattern(resizeButtonPattern);
+					messageField.setX(left);
+					messageField.setY(bottom-msgFieldHeight);
+					messageField.setWidth(right);
+					messageField.setPattern(msgFieldPattern);
+					messageBoard.setX(left);
+					messageBoard.setY(top);
+					messageBoard.setWidth(right);
+					messageBoard.setPattern(msgBoardPattern);
+				}
+			}
+			
+			@Override
+			public void runOnHover() {
+				setPattern(resizeButtonHoverPattern);
+			}
+			
+			@Override
+			public void runOnStopHover() {
+				setPattern(resizeButtonPattern);
+			}
+		};
 		uiRegistry.registerObject(messageField);
 		uiRegistry.registerObject(messageBoard);
 		uiRegistry.registerObject(exitButton);
+		uiRegistry.registerObject(resizeButton);
+	}
+	
+	private void setupCommsFields() {
+		msgFieldPattern = new Pattern();
+		msgBoardPattern = new Pattern();
+		SimplePoint[] msgFieldPoints = new SimplePoint[] 
+			{new SimplePoint(left, bottom-msgFieldHeight), new SimplePoint(right, bottom-msgFieldHeight), new SimplePoint(right, bottom), new SimplePoint(left, bottom)};
+		SimplePoint[] msgBoardPoints = new SimplePoint[]
+			{new SimplePoint(left, top), new SimplePoint(right, top), new SimplePoint(right, bottom-msgFieldHeight+spacer), new SimplePoint(left, bottom-msgFieldHeight+spacer)};
+		msgFieldPattern.addShape(new Shape(Color.GRAY, msgFieldPoints));
+		msgBoardPattern.addShape(new Shape(Color.GRAY, msgBoardPoints));
+	}
+	
+	private void setupCornerButtons() {
+		exitButtonPattern = new Pattern();
+		exitButtonHoverPattern = new Pattern();
+		resizeButtonPattern = new Pattern();
+		resizeButtonHoverPattern = new Pattern();
+		SimplePoint[] exitButtonFillPoints = new SimplePoint[]
+			{new SimplePoint(right-(cbW-cbB), cbB), new SimplePoint(right-cbB, cbB), new SimplePoint(right-cbB, cbW-cbB), new SimplePoint(right-(cbW-cbB), cbW-cbB)};
+		SimplePoint[] exitButtonBorderPoints = new SimplePoint[]
+			{new SimplePoint(right-cbW, top), new SimplePoint(right, top), new SimplePoint(right, cbW), new SimplePoint(right-cbW, cbW), 
+			 new SimplePoint(right-cbW, cbB), new SimplePoint(right-(cbW-cbB), cbB), new SimplePoint(right-(cbW-cbB), cbW-cbB), new SimplePoint(right-cbB, cbW-cbB),
+			 new SimplePoint(right-cbB, cbB), new SimplePoint(right-cbW, cbB)};
+		SimplePoint[] resizeButtonFillPoints = new SimplePoint[] 
+			{new SimplePoint(right-((cbW*2)-cbB), cbB), new SimplePoint(right-cbW-cbB, cbB), new SimplePoint(right-cbW-cbB, cbW-cbB), new SimplePoint(right-((cbW*2)-cbB), cbW-cbB)};
+		SimplePoint[] resizeButtonBorderPoints = new SimplePoint[]
+			{new SimplePoint(right-(cbW*2), top), new SimplePoint(right-(cbW*1), top), new SimplePoint(right-(cbW*1), cbW), new SimplePoint(right-(cbW*2), cbW), 
+			 new SimplePoint(right-(cbW*2), cbB), new SimplePoint(right-((cbW*2)-cbB), cbB), new SimplePoint(right-((cbW*2)-cbB), cbW-cbB), new SimplePoint(right-cbB-(cbW*1), cbW-cbB),
+			 new SimplePoint(right-cbB-(cbW*1), cbB), new SimplePoint(right-(cbW*2), cbB)};
+		
+		exitButtonPattern.addShape(new Shape(new Color(150, 0, 0), exitButtonFillPoints));
+		exitButtonPattern.addShape(new Shape(new Color(60, 0, 0), exitButtonBorderPoints));
+		exitButtonHoverPattern.addShape(new Shape(new Color(180, 60, 60), exitButtonFillPoints));
+		exitButtonHoverPattern.addShape(new Shape(new Color(60, 0, 0), exitButtonBorderPoints));
+		resizeButtonPattern.addShape(new Shape(new Color(150, 150, 150), resizeButtonFillPoints));
+		resizeButtonPattern.addShape(new Shape(new Color(60, 60, 60), resizeButtonBorderPoints));
+		resizeButtonHoverPattern.addShape(new Shape(new Color(180, 180, 180), resizeButtonFillPoints));
+		resizeButtonHoverPattern.addShape(new Shape(new Color(60, 60, 60), resizeButtonBorderPoints));
 	}
 	
 	public void sendMessage(String msg) {

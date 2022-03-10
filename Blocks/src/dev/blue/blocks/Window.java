@@ -2,6 +2,7 @@ package dev.blue.blocks;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -15,27 +16,25 @@ public class Window extends JFrame {
 	
 	private App app;
 	private Dimension d;
+	private Dimension screenSize;
 	public Canvas canvas;
+	public boolean isSmall = false;
 	
 	public Window(App app, String title) {
 		this.app = app;
-		this.d = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+		int taskBarSize = scnMax.bottom;
+		d = new Dimension(screen.width, screen.height - taskBarSize);
+		screenSize = d;
 		setupWindow(title);
 	}
 	
 	private void setupWindow(String title) {
 		this.setTitle(title);
 		this.setUndecorated(true);
-		this.setPreferredSize(d);
-		this.setMinimumSize(d);
-		this.setMaximumSize(d);
-		this.setSize(d);
-		this.setResizable(false);
 		this.canvas = new Canvas();
-		canvas.setPreferredSize(d);
-		canvas.setMinimumSize(d);
-		canvas.setMaximumSize(d);
-		canvas.setSize(d);
+		setupWindowDimensions();
 		
 		this.addMouseListener(app.getMouseManager());
 		this.addMouseMotionListener(app.getMouseManager());
@@ -54,4 +53,40 @@ public class Window extends JFrame {
 		this.setVisible(true);
 	}
 	
+	public void resizeUp() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+		int taskBarSize = scnMax.bottom;
+		d = new Dimension(screenSize.width, screenSize.height - taskBarSize);
+		setupWindowDimensions();
+		setLocationRelativeTo(null);
+		this.pack();
+		this.setVisible(true);
+		isSmall = false;
+	}
+	
+	public void resizeDown() {
+		this.d = new Dimension((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth()*.4), (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()*.4));
+		setupWindowDimensions();
+		setLocationRelativeTo(null);
+		this.pack();
+		this.setVisible(true);
+		isSmall = true;
+	}
+	
+	private void setupWindowDimensions() {
+		this.setPreferredSize(d);
+		this.setMinimumSize(d);
+		this.setMaximumSize(d);
+		this.setSize(d);
+		this.setResizable(false);
+		canvas.setPreferredSize(d);
+		canvas.setMinimumSize(d);
+		canvas.setMaximumSize(d);
+		canvas.setSize(d);
+	}
+	
+	public Dimension getScreenSize() {
+		return screenSize;
+	}
 }
