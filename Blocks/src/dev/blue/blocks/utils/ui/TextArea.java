@@ -173,7 +173,8 @@ public class TextArea extends UIObject {
 	public void update() {
 
 	}
-
+	
+	@Override
 	public void onMouseMove(Point p) {
 		if (this.bounds.contains(p)) {
 			this.hovering = true;
@@ -185,6 +186,7 @@ public class TextArea extends UIObject {
 	public void run() {
 	}
 
+	@Override
 	public boolean onClick(int button, Point p) {
 		if (this.bounds.contains(p)) {
 			run();
@@ -192,7 +194,12 @@ public class TextArea extends UIObject {
 		}
 		return false;
 	}
-
+	
+	@Override
+	public void onScroll(int amount) {
+		
+	}
+	
 	public String getId() {
 		return this.id;
 	}

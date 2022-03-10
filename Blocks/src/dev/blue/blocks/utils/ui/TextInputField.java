@@ -249,6 +249,11 @@ public class TextInputField extends InputField {
 				print();
 			}
 	}
+	
+	@Override
+	public void onScroll(int amount) {
+		
+	}
 
 	public TextInputField setFont(Font font) {
 		this.font = font;

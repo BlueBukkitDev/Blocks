@@ -41,6 +41,8 @@ public abstract class UIObject {
 	public abstract void render(Graphics paramGraphics);
 
 	public abstract void update();
+	
+	public abstract void onScroll(int amount);
 
 	public abstract boolean onClick(int paramInt, Point paramPoint);
 

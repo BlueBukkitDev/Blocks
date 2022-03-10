@@ -137,6 +137,9 @@ public class Button extends UIObject {
 
 	public void onKeyPressed(KeyEvent e) {
 	}
+	
+	public void onScroll(int amount) {
+	}
 
 	public String getId() {
 		return this.id;

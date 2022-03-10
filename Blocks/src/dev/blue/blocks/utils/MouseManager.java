@@ -1,5 +1,6 @@
 package dev.blue.blocks.utils;
 
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -77,6 +78,12 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 		if(app.getWindow().getLocation().getY() < 0) {
 			app.getWindow().setLocation((int)app.getWindow().getLocation().getX(), 0);
 		}
+		if(app.getWindow().getLocation().getX()+app.getWindow().getWidth() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) {
+			app.getWindow().setLocation((int)Toolkit.getDefaultToolkit().getScreenSize().getWidth()-app.getWindow().getWidth(), (int)app.getWindow().getLocation().getY());
+		}
+		if(app.getWindow().getLocation().getY() > Toolkit.getDefaultToolkit().getScreenSize().getHeight()) {
+			app.getWindow().setLocation((int)app.getWindow().getLocation().getX(), 0);
+		}
 	}
 
 	@Override
@@ -88,6 +95,8 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		
+		for(UIObject each:app.getUIRegistry().getObjects()) {
+			each.onScroll(e.getScrollAmount());//Negative to roll away or up, positive to roll toward or down
+		}
 	}
 }

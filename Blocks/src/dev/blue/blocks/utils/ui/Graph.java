@@ -302,6 +302,11 @@ public class Graph extends UIObject {
 			runOnStopHover();
 		}
 	}
+	
+	@Override
+	public void onScroll(int amount) {
+		
+	}
 
 	public int getX() {
 		return this.x;
