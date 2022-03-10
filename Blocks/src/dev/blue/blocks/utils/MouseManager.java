@@ -15,6 +15,7 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 	public UIObject clickedObject;
 	private App app;
 	
+	private boolean mouseDown = false;
 	private int xOffset;
 	private int yOffset;
 	
@@ -33,18 +34,22 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		int xOffset = (int)e.getLocationOnScreen().getX() - (int)app.getWindow().getLocation().getX();//mouseCoord will always be larger than windowCoord
-		int yOffset = (int)e.getLocationOnScreen().getY() - (int)app.getWindow().getLocation().getY();
-		//alertUIObjectDown(e.getButton(), e.getPoint());
-		for(UIObject each:app.getUIRegistry().getObjects()) {
-			if(each.onMouseDown(e.getButton(), e.getPoint())) {
-				clickedObject = each;
+		if(!mouseDown) {
+			mouseDown = true;
+			xOffset = (int)e.getLocationOnScreen().getX() - (int)app.getWindow().getLocation().getX();//mouseCoord will always be larger than windowCoord
+			yOffset = (int)e.getLocationOnScreen().getY() - (int)app.getWindow().getLocation().getY();
+			//alertUIObjectDown(e.getButton(), e.getPoint());
+			for(UIObject each:app.getUIRegistry().getObjects()) {
+				if(each.onMouseDown(e.getButton(), e.getPoint())) {
+					clickedObject = each;
+				}
 			}
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		mouseDown = false;
 		for(UIObject each:app.getUIRegistry().getObjects()) {
 			each.onMouseUp(e.getButton(), e.getPoint());
 		}
@@ -62,12 +67,10 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		int windowX = (int)app.getWindow().getLocation().getX();
 		int mouseX = (int)e.getLocationOnScreen().getX();
-		int windowY = (int)app.getWindow().getLocation().getY();
 		int mouseY = (int)e.getLocationOnScreen().getY();
 		
-		app.getWindow().setLocation(mouseX + xOffset, mouseY + yOffset);
+		app.getWindow().setLocation(mouseX - xOffset, mouseY - yOffset);
 	}
 
 	@Override
