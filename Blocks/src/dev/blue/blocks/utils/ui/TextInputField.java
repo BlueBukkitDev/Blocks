@@ -28,6 +28,10 @@ public class TextInputField extends InputField {
 	protected String text2 = "";
 
 	protected String displayText = "";
+	
+	protected String prefix = "";
+	
+	protected String suffix = "";
 
 	protected String preview = "";
 
@@ -35,7 +39,7 @@ public class TextInputField extends InputField {
 			'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
 			'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5',
 			'6', '7', '8', '9', '0', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '-', '+', '=', '~', '`',
-			',', '<', '.', '>', '/', '?', '\\', '|', ' ', '{', '}', '[', ']', ':', ';', '\'', '"', '\'' };
+			',', '<', '.', '>', '/', '?', '\\', '|', ' ', '{', '}', '[', ']', ':', ';', '\'', '"', '°', '§' };
 
 	protected Graphics g;
 
@@ -50,9 +54,9 @@ public class TextInputField extends InputField {
 	protected boolean visible = true;
 
 	private TextArea toWriteTo;
-	
+
 	private Pattern pattern;
-	
+
 	private int lineHeight = 0;
 
 	public TextInputField(App app, String id, int x, int y, int width, int height, String preview, String value,
@@ -132,7 +136,6 @@ public class TextInputField extends InputField {
 	public boolean onClick(int button, Point p) {
 		if (this.visible) {
 			if (this.bounds.contains(p)) {
-				System.out.println("Clickety");
 				this.timer = 0;
 				if (this.writable) {
 					this.selected = true;
@@ -180,8 +183,7 @@ public class TextInputField extends InputField {
 			}
 			return false;
 		}
-		if (app.getUIRegistry().selected != null
-				&& app.getUIRegistry().selected == this)
+		if (app.getUIRegistry().selected != null && app.getUIRegistry().selected == this)
 			app.getUIRegistry().selected = null;
 		this.selected = false;
 		return false;
@@ -191,45 +193,54 @@ public class TextInputField extends InputField {
 		if (this.visible)
 			if (this.bounds.contains(p)) {
 				this.hovering = true;
-				//app.getMouseManager().setCursor(app.getTextures().typeCursor);
+				app.getMouseManager().setTypeCursor();
 			} else {
 				this.hovering = false;
-				//app.getMouseManager().setCursor(app.getTextures().basicCursor);
+				app.getMouseManager().setNormalCursor();
 			}
 	}
 
 	public void onType(KeyEvent e) {
 		if (this.visible) {
-			if (this.g.getFontMetrics().stringWidth(String.valueOf(this.text1) + this.text2 + e.getKeyChar()) <= this.width - this.indent * 2) {//if the width is not too wide
-				byte b;
-				int i;
-				char[] arrayOfChar;
-				for (i = (arrayOfChar = this.allowed).length, b = 0; b < i;) {
-					char each = arrayOfChar[b];
-					if (each == e.getKeyChar()) {
-						this.text1 = String.valueOf(this.text1) + e.getKeyChar();
-						this.displayText = String.valueOf(this.text1) + this.text2;
-						this.typeIndex++;
-						break;
+			if (selected) {
+				if (this.g.getFontMetrics().stringWidth(
+						String.valueOf(this.text1) + this.text2 + e.getKeyChar()) <= this.width - this.indent * 2) {// if
+																													// the
+																													// width
+																													// is
+																													// not
+																													// too
+																													// wide
+					byte b;
+					int i;
+					char[] arrayOfChar;
+					for (i = (arrayOfChar = this.allowed).length, b = 0; b < i;) {
+						char each = arrayOfChar[b];
+						if (each == e.getKeyChar()) {
+							this.text1 = String.valueOf(this.text1) + e.getKeyChar();
+							this.displayText = String.valueOf(this.text1) + this.text2;
+							this.typeIndex++;
+							break;
+						}
+						b++;
 					}
-					b++;
+				} else {
+					this.setHeight(this.getHeight() + this.lineHeight);
+					this.setY(this.y - this.lineHeight);
 				}
-			}else {
-				this.setHeight(this.getHeight()+this.lineHeight);
-				this.setY(this.y-this.lineHeight);
+				if (e.getKeyChar() == '\b' && this.text1.length() > 0) {
+					this.text1 = this.text1.substring(0, this.text1.length() - 1);
+					this.displayText = String.valueOf(this.text1) + this.text2;
+					this.typeIndex--;
+				}
+				if (this.protectedDisplay) {
+					String replacement = "";
+					for (int i = 0; i < this.displayText.length(); i++)
+						replacement = String.valueOf(replacement) + "*";
+					this.displayText = replacement;
+				}
+				onTypeExtra();
 			}
-			if (e.getKeyChar() == '\b' && this.text1.length() > 0) {
-				this.text1 = this.text1.substring(0, this.text1.length() - 1);
-				this.displayText = String.valueOf(this.text1) + this.text2;
-				this.typeIndex--;
-			}
-			if (this.protectedDisplay) {
-				String replacement = "";
-				for (int i = 0; i < this.displayText.length(); i++)
-					replacement = String.valueOf(replacement) + "*";
-				this.displayText = replacement;
-			}
-			onTypeExtra();
 		}
 	}
 
@@ -237,55 +248,63 @@ public class TextInputField extends InputField {
 	}
 
 	public void onKeyPressed(KeyEvent e) {
-		if (this.visible)
-			if (e.getKeyCode() == 37) {
-				if (this.typeIndex >= 1) {
-					this.text1 = this.text1.substring(0, this.text1.length() - 1);
-					this.text2 = this.displayText.substring(this.typeIndex - 1, this.displayText.length());
-					this.typeIndex--;
-					this.timer = 0;
+		if (this.visible) {
+			if (selected) {
+				if (e.getKeyCode() == KeyEvent.VK_LEFT) {// 37
+					if (this.typeIndex >= 1) {
+						this.text1 = this.text1.substring(0, this.text1.length() - 1);
+						this.text2 = this.displayText.substring(this.typeIndex - 1, this.displayText.length());
+						this.typeIndex--;
+						this.timer = 0;
+					}
+				} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {// 39
+					if (this.typeIndex < this.displayText.length()) {
+						this.text1 = this.displayText.substring(0, this.text1.length() + 1);
+						this.text2 = this.displayText.substring(this.typeIndex + 1, this.displayText.length());
+						this.typeIndex++;
+						this.timer = 0;
+					}
+				} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {// 10
+					print();
 				}
-			} else if (e.getKeyCode() == 39) {
-				if (this.typeIndex < this.displayText.length()) {
-					this.text1 = this.displayText.substring(0, this.text1.length() + 1);
-					this.text2 = this.displayText.substring(this.typeIndex + 1, this.displayText.length());
-					this.typeIndex++;
-					this.timer = 0;
-				}
-			} else if (e.getKeyCode() == 10) {
-				print();
 			}
+		}
 	}
-	
+
 	@Override
 	public void onScroll(int amount) {
-		
+
 	}
 
 	public TextInputField setFont(Font font) {
 		this.font = font;
 		return this;
 	}
-	
-	public void onPrint() {}
+
+	public boolean onPrint() {
+		return true;
+	}
 
 	public void print() {
-    if (this.toWriteTo != null) {
-      String message = getText();
-      if (message.contains("§")) {
-        TextBit[] bits = getBits(message);
-        if (bits != null) {
-          this.toWriteTo.addLine(bits);
-          onPrint();
-          setText("");
-        } 
-      } else {
-        this.toWriteTo.addLine(new TextBit[] { new TextBit(app, Color.BLACK, (app.getFonts()).plain, message, null, null) });
-        onPrint();
-        setText("");
-      } 
-    }
-
+		if(onPrint()) {
+			if (this.toWriteTo != null) {
+				String message = prefix+getText()+suffix;
+				if (message.contains("§")) {
+					TextBit[] bits = getBits(message);
+					if (bits != null) {
+						this.toWriteTo.addLine(bits);
+						setText("");
+						prefix = "";
+						suffix = "";
+					}
+				} else {
+					this.toWriteTo.addLine(new TextBit[] { new TextBit(app, Color.BLACK, (app.getFonts()).plain, message, null, null) });
+					setText("");
+					prefix = "";
+					suffix = "";
+				}
+			}
+		}
 	}
 
 	public void setToWriteTo(TextArea toWriteTo) {
@@ -297,65 +316,69 @@ public class TextInputField extends InputField {
 	}
 
 	private TextBit[] getBits(String message) {
-    String[] parts = message.split("§");
-    TextBit[] bits = new TextBit[parts.length];
-    for (int i = 1; i < parts.length; i++) {
-      TextBit bit;
-      if (parts[i].startsWith("a")) {
-        bit = new TextBit(app, new Color(0, 255, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("b")) {
-        bit = new TextBit(app, Color.CYAN, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("c")) {
-        bit = new TextBit(app, Color.RED, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("d")) {
-        bit = new TextBit(app, Color.PINK, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("e")) {
-        bit = new TextBit(app, Color.YELLOW, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("f")) {
-        bit = new TextBit(app, Color.WHITE, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("0")) {
-        bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("1")) {
-        bit = new TextBit(app, Color.BLUE, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("2")) {
-        bit = new TextBit(app, new Color(0, 80, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("3")) {
-        bit = new TextBit(app, new Color(0, 80, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("4")) {
-        bit = new TextBit(app, new Color(80, 0, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("5")) {
-        bit = new TextBit(app, new Color(80, 0, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("6")) {
-        bit = new TextBit(app, new Color(80, 0, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("7")) {
-        bit = new TextBit(app, Color.GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("8")) {
-        bit = new TextBit(app, Color.DARK_GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("9")) {
-        bit = new TextBit(app, new Color(80, 0, 200), (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (parts[i].startsWith("l")) {
-        if (i > 1) {
-          bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).bold, parts[i].substring(1), null, null);
-        } else {
-          bit = new TextBit(app, Color.BLACK, (app.getFonts()).bold, parts[i].substring(1), null, null);
-        } 
-      } else if (parts[i].startsWith("i")) {
-        if (i > 1) {
-          bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).italic, parts[i].substring(1), null, null);
-        } else {
-          bit = new TextBit(app, Color.BLACK, (app.getFonts()).italic, parts[i].substring(1), null, null);
-        } 
-      } else if (parts[i].startsWith("r")) {
-        bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
-      } else if (i > 1) {
-        bit = new TextBit(app, bits[i - 1].getC(), bits[i - 1].getF(), parts[i], null, null);
-      } else {
-        bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, "§"+ parts[i], null, null);
-      } 
-      bits[i] = bit;
-    } 
-    return bits;
-  }
+		String[] parts = message.split("§");
+		TextBit[] bits = new TextBit[parts.length];
+		for (int i = 1; i < parts.length; i++) {
+			TextBit bit;
+			if (parts[i].startsWith("a")) {
+				bit = new TextBit(app, new Color(0, 255, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("b")) {
+				bit = new TextBit(app, Color.CYAN, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("c")) {
+				bit = new TextBit(app, Color.RED, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("d")) {
+				bit = new TextBit(app, Color.PINK, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("e")) {
+				bit = new TextBit(app, Color.YELLOW, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("f")) {
+				bit = new TextBit(app, Color.WHITE, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("0")) {
+				bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("1")) {
+				bit = new TextBit(app, Color.BLUE, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("2")) {
+				bit = new TextBit(app, new Color(0, 80, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("3")) {
+				bit = new TextBit(app, new Color(0, 80, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("4")) {
+				bit = new TextBit(app, new Color(80, 0, 0), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("5")) {
+				bit = new TextBit(app, new Color(80, 0, 80), (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("6")) {
+				bit = new TextBit(app, new Color(220, 220, 0), (app.getFonts()).plain, parts[i].substring(1), null,
+						null);
+			} else if (parts[i].startsWith("7")) {
+				bit = new TextBit(app, Color.GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("8")) {
+				bit = new TextBit(app, Color.DARK_GRAY, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (parts[i].startsWith("9")) {
+				bit = new TextBit(app, new Color(80, 0, 200), (app.getFonts()).plain, parts[i].substring(1), null,
+						null);
+			} else if (parts[i].startsWith("l")) {
+				if (i > 1) {
+					bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).bold, parts[i].substring(1), null,
+							null);
+				} else {
+					bit = new TextBit(app, Color.BLACK, (app.getFonts()).bold, parts[i].substring(1), null, null);
+				}
+			} else if (parts[i].startsWith("i")) {
+				if (i > 1) {
+					bit = new TextBit(app, bits[i - 1].getC(), (app.getFonts()).italic, parts[i].substring(1), null,
+							null);
+				} else {
+					bit = new TextBit(app, Color.BLACK, (app.getFonts()).italic, parts[i].substring(1), null, null);
+				}
+			} else if (parts[i].startsWith("r")) {
+				bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, parts[i].substring(1), null, null);
+			} else if (i > 1) {
+				bit = new TextBit(app, bits[i - 1].getC(), bits[i - 1].getF(), parts[i], null, null);
+			} else {
+				bit = new TextBit(app, Color.BLACK, (app.getFonts()).plain, "§" + parts[i], null, null);
+			}
+			bits[i] = bit;
+		}
+		return bits;
+	}
 
 	private int getIndex(Point p) {
 		if (this.bounds.contains(p))
@@ -368,7 +391,7 @@ public class TextInputField extends InputField {
 			}
 		return 0;
 	}
-	
+
 	public void setPattern(Pattern pattern) {
 		this.pattern = pattern;
 	}

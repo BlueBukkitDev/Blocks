@@ -66,7 +66,7 @@ public class Window extends JFrame {
 	}
 	
 	public void resizeDown() {
-		this.d = new Dimension((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth()*.4), (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()*.4));
+		this.d = new Dimension((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth()*.6), (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight()*.6));
 		setupWindowDimensions();
 		setLocationRelativeTo(null);
 		this.pack();

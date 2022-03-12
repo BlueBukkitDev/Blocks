@@ -18,7 +18,7 @@ public class Server implements Runnable {
 		try {
 			socket = new DatagramSocket(45225);
 		} catch (SocketException e) {
-			e.printStackTrace();
+			System.out.println("Could not bind to socket; address already in use.");
 		}
 	}
 

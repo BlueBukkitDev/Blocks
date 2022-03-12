@@ -9,5 +9,7 @@ public class Fonts {
 	
 	public Fonts() {
 		plain = new Font("Helvetica", Font.PLAIN, 14);
+		bold = new Font("Helvetica", Font.BOLD, 14);
+		italic = new Font("Helvetica", Font.ITALIC, 14);
 	}
 }

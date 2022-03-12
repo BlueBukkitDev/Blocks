@@ -9,7 +9,7 @@ import java.util.Calendar;
 
 import dev.blue.blocks.App;
 import dev.blue.blocks.utils.Animation;
-import dev.blue.blocks.utils.SimplePoint;
+import dev.blue.blocks.utils.SP;
 
 public class Graph extends UIObject {
 	private App app;
@@ -33,7 +33,7 @@ public class Graph extends UIObject {
 
 	private double pointSpacing;
 
-	private SimplePoint[] points;
+	private SP[] points;
 
 	private Animation animation;
 
@@ -66,7 +66,7 @@ public class Graph extends UIObject {
 		app.getUIRegistry().registerObject(this.infoPanel);
 		this.pointSpacing = (width - cushion * 2) / (values.length - 1);
 		double xCoord = cushion;
-		this.points = new SimplePoint[values.length];
+		this.points = new SP[values.length];
 		this.buttons = new Button[values.length];
 		/*for (int i = 0; i < values.length; i++) {
 			YamlConfiguration yaml;

@@ -1,12 +1,12 @@
 package dev.blue.blocks.utils;
 
 
-public class SimplePoint {
+public class SP {
   int x;
   
   int y;
   
-  public SimplePoint(int x, int y) {
+  public SP(int x, int y) {
     this.x = x;
     this.y = y;
   }

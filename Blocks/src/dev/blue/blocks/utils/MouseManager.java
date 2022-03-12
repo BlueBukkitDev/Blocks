@@ -1,5 +1,6 @@
 package dev.blue.blocks.utils;
 
+import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -96,7 +97,16 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		for(UIObject each:app.getUIRegistry().getObjects()) {
-			each.onScroll(e.getScrollAmount());//Negative to roll away or up, positive to roll toward or down
+			each.onScroll(e.getScrollAmount());//Negative to roll away or up, positive to roll toward or down list.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		}
+	}
+	
+	public void setTypeCursor() {
+		app.getWindow().canvas.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void setNormalCursor() {
+		app.getWindow().canvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
 }

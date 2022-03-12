@@ -9,11 +9,13 @@ import java.awt.image.BufferStrategy;
 import dev.blue.blocks.utils.Fonts;
 import dev.blue.blocks.utils.KeyManager;
 import dev.blue.blocks.utils.MouseManager;
-import dev.blue.blocks.utils.SimplePoint;
+import dev.blue.blocks.utils.SP;
 import dev.blue.blocks.utils.ui.Button;
+import dev.blue.blocks.utils.ui.NumberInputField;
 import dev.blue.blocks.utils.ui.TextArea;
 import dev.blue.blocks.utils.ui.TextInputField;
 import dev.blue.blocks.utils.ui.UIObjectRegistry;
+import dev.blue.blocks.utils.ui.gfx.Graphic;
 import dev.blue.blocks.utils.ui.gfx.Pattern;
 import dev.blue.blocks.utils.ui.gfx.Shape;
 
@@ -23,14 +25,6 @@ public class App implements Runnable {
 	private BufferStrategy bs;
 	private double FPS= 60;
 	
-	private Server server;
-	private Client client;
-	private Window window;
-	private KeyManager keyManager;
-	private MouseManager mouseManager;
-	private Fonts fonts;
-	private UIObjectRegistry uiRegistry;
-	
 	private int cbW;
 	private int cbB;
 	private int bottom;
@@ -39,18 +33,50 @@ public class App implements Runnable {
 	private int right;
 	private int msgFieldHeight;
 	private int spacer;
+	private int msgMenuWidth;
+	private int profileHeight;
+	
+	private Server server;
+	private Client client;
+	private Window window;
+	private KeyManager keyManager;
+	private MouseManager mouseManager;
+	private Fonts fonts;
+	private UIObjectRegistry uiRegistry;
 	
 	private Pattern msgFieldPattern;
 	private Pattern msgBoardPattern;
+	private Pattern usernamePattern;
 	private Pattern exitButtonPattern;
 	private Pattern exitButtonHoverPattern;
 	private Pattern resizeButtonPattern;
 	private Pattern resizeButtonHoverPattern;
 	
+	private Pattern fbSpacerGraphicPattern;
+	private Pattern fbMenuSpacerGraphicPattern;
+	private Pattern headerGraphicPattern;
+	private Pattern headerSpacerGraphicPattern;
+	private Pattern profileGraphicPattern;
+	private Pattern profileSpacerGraphicPattern;
+	private Pattern msgMenuGraphicPattern;
+	private Pattern portOutPattern;
+	
 	private TextArea messageBoard;
 	private TextInputField messageField;
+	private TextInputField username;
+	private TextInputField ipTarget;
+	private NumberInputField portOut;
+	private NumberInputField portTarget;
 	private Button exitButton;
 	private Button resizeButton;
+	
+	private Graphic fbSpacer;
+	private Graphic fbMenuSpacer;
+	private Graphic header;
+	private Graphic headerSpacer;
+	private Graphic profile;
+	private Graphic profileSpacer;
+	private Graphic msgMenu;
 	
 	public App() {
 		thread = new Thread(this);
@@ -81,24 +107,115 @@ public class App implements Runnable {
 		right = window.getWidth();
 		msgFieldHeight = 28;
 		spacer = 2;
+		msgMenuWidth = (right/7);
+		profileHeight = (bottom/7);
 	}
 	
 	public void setupPage() {
-		setupCornerButtons();
-		setupCommsFields();
-		
-		messageBoard = new TextArea(this, "msgBoard", left, top, right, bottom-msgFieldHeight, 5, msgBoardPattern);
-		messageField = new TextInputField(this, "message", left, bottom-msgFieldHeight, right, msgFieldHeight, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
+		messageBoard = new TextArea(this, "msgBoard", msgMenuWidth+spacer, cbW+spacer, right-msgMenuWidth-spacer, bottom-msgFieldHeight-cbW-spacer, 5, msgBoardPattern);
+		messageField = new TextInputField(this, "message", msgMenuWidth+spacer, bottom-msgFieldHeight, right-msgMenuWidth-spacer, msgFieldHeight, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
 			@Override
-			public void onPrint() {
-				client.sendMessage(this.getText());
+			public boolean onPrint() {
+				if(username.getText().length() <= 4) {
+					messageBoard.logInfo("You must set a username at least 4 characters long");
+					return false;
+				}else {
+					client.sendMessage(username.getText()+">> "+this.getText());
+					prefix = username.getText()+" ";
+					return true;
+				}
 			}
 		};
+		username = new TextInputField(this, "username", spacer, profileHeight-(2*msgFieldHeight)-spacer+cbW, (msgMenuWidth-(spacer*2))/3*2, msgFieldHeight, "username", "", true, false, null, usernamePattern) {
+			
+		};
+		portOut = new NumberInputField(this, "portOut", username.getX()+username.getWidth()+spacer, username.getY(), username.getWidth()/2-spacer, username.getHeight(), "port", "", true, false, null, portOutPattern) {
+			
+		};
+		setupCornerButtons();
+		setupGraphics();
+		/*ipTarget;
+		portOut;
+		portTarget;*/
+		
+		setupCornerButtonPatterns();
+		setupCommsFieldsPatterns();
+		setupGraphicPatterns();
+		
+		messageBoard.setPattern(msgBoardPattern);
+		messageField.setPattern(msgFieldPattern);
+		username.setPattern(usernamePattern);
+		portOut.setPattern(portOutPattern);
+		
+		uiRegistry.registerObject(fbSpacer);
+		uiRegistry.registerObject(fbMenuSpacer);
+		uiRegistry.registerObject(header);
+		uiRegistry.registerObject(headerSpacer);
+		uiRegistry.registerObject(profile);
+		uiRegistry.registerObject(profileSpacer);
+		uiRegistry.registerObject(msgMenu);
+		
+		uiRegistry.registerObject(messageField);
+		uiRegistry.registerObject(messageBoard);
+		uiRegistry.registerObject(username);
+		uiRegistry.registerObject(portOut);
+		
+		uiRegistry.registerObject(exitButton);
+		uiRegistry.registerObject(resizeButton);
+	}
+	
+	private void setupGraphics() {
+		fbSpacer = new Graphic("fbSpacer", fbSpacerGraphicPattern);
+		fbMenuSpacer = new Graphic("fbMenuSpacer", fbMenuSpacerGraphicPattern);
+		header = new Graphic("header", headerGraphicPattern);
+		headerSpacer = new Graphic("headerSpacer", headerSpacerGraphicPattern);
+		profile = new Graphic("profile", profileGraphicPattern);
+		profileSpacer = new Graphic("profileSpacer", profileSpacerGraphicPattern);
+		msgMenu = new Graphic("msgMenu", msgMenuGraphicPattern);
+	}
+	
+	private void setupGraphicPatterns() {
+		fbSpacerGraphicPattern = new Pattern();
+		fbMenuSpacerGraphicPattern = new Pattern();
+		headerGraphicPattern = new Pattern();
+		headerSpacerGraphicPattern = new Pattern();
+		profileGraphicPattern = new Pattern();
+		profileSpacerGraphicPattern = new Pattern();
+		msgMenuGraphicPattern = new Pattern();
+		
+		fbSpacerGraphicPattern.addShape(new Shape(fbSpacer, Color.YELLOW, new SP(left+msgMenuWidth, bottom-msgFieldHeight-spacer), 
+			new SP(right, bottom-msgFieldHeight-spacer), new SP(right, bottom-msgFieldHeight), new SP(left+msgMenuWidth, bottom-msgFieldHeight)));
+		fbMenuSpacerGraphicPattern.addShape(new Shape(fbMenuSpacer, Color.YELLOW, new SP(msgMenuWidth, top+cbW+spacer), new SP(msgMenuWidth+spacer, top+cbW+spacer),
+			new SP(msgMenuWidth+spacer, bottom), new SP(msgMenuWidth, bottom)));
+		headerGraphicPattern.addShape(new Shape(header, new Color(70, 65, 60), new SP(left, top), new SP(right-(cbW*2), top), new SP(right-(cbW*2), top+cbW), new SP(left, top+cbW)));
+		headerSpacerGraphicPattern.addShape(new Shape(headerSpacer, Color.YELLOW, new SP(left, cbW), new SP(right, cbW), new SP(right, cbW+spacer), new SP(left, cbW+spacer)));
+		profileGraphicPattern.addShape(new Shape(profile, Color.GRAY, new SP(left, top+cbW+spacer), new SP(left+msgMenuWidth, top+cbW+spacer), 
+			new SP(left+msgMenuWidth, profileHeight+cbW+spacer), new SP(left, profileHeight+cbW+spacer)));
+		profileSpacerGraphicPattern.addShape(new Shape(profileSpacer, Color.YELLOW, new SP(left, profileHeight+cbW+spacer), new SP(left+msgMenuWidth, profileHeight+cbW+spacer), 
+			new SP(left+msgMenuWidth, profileHeight+cbW+(spacer*2)), new SP(left, profileHeight+cbW+(spacer*2))));
+		msgMenuGraphicPattern.addShape(new Shape(msgMenu, Color.GRAY, new SP(left, profileHeight+cbW+(spacer*2)), new SP(left+msgMenuWidth, profileHeight+cbW+(spacer*2)), 
+			new SP(left+msgMenuWidth, bottom), new SP(left, bottom)));
+		
+		
+		fbSpacer.setPattern(fbSpacerGraphicPattern);
+		fbMenuSpacer.setPattern(fbMenuSpacerGraphicPattern);
+		header.setPattern(headerGraphicPattern);
+		headerSpacer.setPattern(headerSpacerGraphicPattern);
+		profile.setPattern(profileGraphicPattern);
+		profileSpacer.setPattern(profileSpacerGraphicPattern);
+		msgMenu.setPattern(msgMenuGraphicPattern);
+	}
+	
+	private void setupCornerButtons() {
 		exitButton = new Button(this, "exit", false, false, 14, right-cbW, top, cbW, cbW, exitButtonPattern) {
 			@Override
 			public void runClick() {
-				client.close();
-				server.stop();
+				try {
+					client.close();
+					server.stop();
+				}catch(Exception e) {
+					
+				}
 				System.exit(0);
 			}
 			
@@ -134,17 +251,12 @@ public class App implements Runnable {
 				setPattern(resizeButtonPattern);
 			}
 		};
-		
-		uiRegistry.registerObject(messageField);
-		uiRegistry.registerObject(messageBoard);
-		uiRegistry.registerObject(exitButton);
-		uiRegistry.registerObject(resizeButton);
 	}
 	
 	private void resetPage() {
 		setupMeasurements();
-		setupCornerButtons();
-		setupCommsFields();
+		setupCornerButtonPatterns();
+		setupCommsFieldsPatterns();
 		exitButton.setX(right-cbW);
 		exitButton.setY(top);
 		exitButton.setPattern(exitButtonPattern);
@@ -161,43 +273,49 @@ public class App implements Runnable {
 		messageBoard.setPattern(msgBoardPattern);
 	}
 	
-	private void setupCommsFields() {
+	private void setupCommsFieldsPatterns() {
 		msgFieldPattern = new Pattern();
 		msgBoardPattern = new Pattern();
-		SimplePoint[] msgFieldPoints = new SimplePoint[] 
-			{new SimplePoint(left, bottom-msgFieldHeight), new SimplePoint(right, bottom-msgFieldHeight), new SimplePoint(right, bottom), new SimplePoint(left, bottom)};
-		SimplePoint[] msgBoardPoints = new SimplePoint[]
-			{new SimplePoint(left, top), new SimplePoint(right, top), new SimplePoint(right, bottom-msgFieldHeight+spacer), new SimplePoint(left, bottom-msgFieldHeight+spacer)};
-		msgFieldPattern.addShape(new Shape(Color.GRAY, msgFieldPoints));
-		msgBoardPattern.addShape(new Shape(Color.GRAY, msgBoardPoints));
+		usernamePattern = new Pattern();
+		portOutPattern = new Pattern();
+		
+		msgFieldPattern.addShape(new Shape(messageField, new Color(60, 60, 60), 
+			new SP(left, top), new SP(messageField.getWidth(), top), new SP(messageField.getWidth(), messageField.getHeight()), new SP(left, messageField.getHeight())));
+		msgBoardPattern.addShape(new Shape(messageBoard, new Color(80, 80, 80), 
+			new SP(left, top), new SP(messageBoard.getWidth(), top), new SP(messageBoard.getWidth(), messageBoard.getHeight()), new SP(left, messageBoard.getHeight())));
+		usernamePattern.addShape(new Shape(username, new Color(200, 200, 200), 
+			new SP(left, top), new SP(username.getWidth(), top), new SP(username.getWidth(), username.getHeight()), new SP(left, username.getHeight())));
+		portOutPattern.addShape(new Shape(portOut, new Color(200, 200, 200),
+			new SP(left, top), new SP(portOut.getWidth(), top), new SP(portOut.getWidth(), portOut.getHeight()), new SP(left, portOut.getHeight())));
 	}
 	
-	private void setupCornerButtons() {
+	private void setupCornerButtonPatterns() {
 		exitButtonPattern = new Pattern();
 		exitButtonHoverPattern = new Pattern();
 		resizeButtonPattern = new Pattern();
 		resizeButtonHoverPattern = new Pattern();
-		SimplePoint[] exitButtonFillPoints = new SimplePoint[]
-			{new SimplePoint(right-(cbW-cbB), cbB), new SimplePoint(right-cbB, cbB), new SimplePoint(right-cbB, cbW-cbB), new SimplePoint(right-(cbW-cbB), cbW-cbB)};
-		SimplePoint[] exitButtonBorderPoints = new SimplePoint[]
-			{new SimplePoint(right-cbW, top), new SimplePoint(right, top), new SimplePoint(right, cbW), new SimplePoint(right-cbW, cbW), 
-			 new SimplePoint(right-cbW, cbB), new SimplePoint(right-(cbW-cbB), cbB), new SimplePoint(right-(cbW-cbB), cbW-cbB), new SimplePoint(right-cbB, cbW-cbB),
-			 new SimplePoint(right-cbB, cbB), new SimplePoint(right-cbW, cbB)};
-		SimplePoint[] resizeButtonFillPoints = new SimplePoint[] 
-			{new SimplePoint(right-((cbW*2)-cbB), cbB), new SimplePoint(right-cbW-cbB, cbB), new SimplePoint(right-cbW-cbB, cbW-cbB), new SimplePoint(right-((cbW*2)-cbB), cbW-cbB)};
-		SimplePoint[] resizeButtonBorderPoints = new SimplePoint[]
-			{new SimplePoint(right-(cbW*2), top), new SimplePoint(right-(cbW*1), top), new SimplePoint(right-(cbW*1), cbW), new SimplePoint(right-(cbW*2), cbW), 
-			 new SimplePoint(right-(cbW*2), cbB), new SimplePoint(right-((cbW*2)-cbB), cbB), new SimplePoint(right-((cbW*2)-cbB), cbW-cbB), new SimplePoint(right-cbB-(cbW*1), cbW-cbB),
-			 new SimplePoint(right-cbB-(cbW*1), cbB), new SimplePoint(right-(cbW*2), cbB)};
+		SP[] exitButtonFillPoints = new SP[] {new SP(cbB, cbB), new SP(cbW-cbB, cbB), new SP(cbW-cbB, cbW-cbB), new SP(cbB, cbW-cbB)};
+		SP[] exitButtonBorderPoints = new SP[]
+			{new SP(left, top), new SP(cbW, top), new SP(cbW, cbW), new SP(left, cbW),//bl
+			 new SP(left, cbB), new SP(cbB, cbB), new SP(cbB, cbW-cbB), new SP(cbW-cbB, cbW-cbB),//br
+			 new SP(cbW-cbB, cbB), new SP(left, cbB)};
+		SP[] resizeButtonFillPoints = new SP[] {new SP(cbB, cbB), new SP(cbW-cbB, cbB), new SP(cbW-cbB, cbW-cbB), new SP(cbB, cbW-cbB)};
+		SP[] resizeButtonBorderPoints = new SP[]
+				{new SP(left, top), new SP(cbW, top), new SP(cbW, cbW), new SP(left, cbW),//bl
+				 new SP(left, cbB), new SP(cbB, cbB), new SP(cbB, cbW-cbB), new SP(cbW-cbB, cbW-cbB),//br
+				 new SP(cbW-cbB, cbB), new SP(left, cbB)};
 		
-		exitButtonPattern.addShape(new Shape(new Color(150, 0, 0), exitButtonFillPoints));
-		exitButtonPattern.addShape(new Shape(new Color(60, 0, 0), exitButtonBorderPoints));
-		exitButtonHoverPattern.addShape(new Shape(new Color(180, 60, 60), exitButtonFillPoints));
-		exitButtonHoverPattern.addShape(new Shape(new Color(60, 0, 0), exitButtonBorderPoints));
-		resizeButtonPattern.addShape(new Shape(new Color(150, 150, 150), resizeButtonFillPoints));
-		resizeButtonPattern.addShape(new Shape(new Color(60, 60, 60), resizeButtonBorderPoints));
-		resizeButtonHoverPattern.addShape(new Shape(new Color(180, 180, 180), resizeButtonFillPoints));
-		resizeButtonHoverPattern.addShape(new Shape(new Color(60, 60, 60), resizeButtonBorderPoints));
+		exitButtonPattern.addShape(new Shape(exitButton, new Color(150, 0, 0), exitButtonFillPoints));
+		exitButtonPattern.addShape(new Shape(exitButton, new Color(60, 0, 0), exitButtonBorderPoints));
+		exitButtonHoverPattern.addShape(new Shape(exitButton, new Color(180, 60, 60), exitButtonFillPoints));
+		exitButtonHoverPattern.addShape(new Shape(exitButton, new Color(60, 0, 0), exitButtonBorderPoints));
+		resizeButtonPattern.addShape(new Shape(resizeButton, new Color(150, 150, 150), resizeButtonFillPoints));
+		resizeButtonPattern.addShape(new Shape(resizeButton, new Color(60, 60, 60), resizeButtonBorderPoints));
+		resizeButtonHoverPattern.addShape(new Shape(resizeButton, new Color(180, 180, 180), resizeButtonFillPoints));
+		resizeButtonHoverPattern.addShape(new Shape(resizeButton, new Color(60, 60, 60), resizeButtonBorderPoints));
+		
+		exitButton.setPattern(exitButtonPattern);
+		resizeButton.setPattern(resizeButtonPattern);
 	}
 	
 	public void sendMessage(String msg) {
