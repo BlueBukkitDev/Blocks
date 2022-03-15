@@ -24,6 +24,10 @@ public class Shape {
 		this.color = color;
 	}
 	
+	public UIObject getParent() {
+		return parent;
+	}
+	
 	public Polygon getShape() {
 		return poly;
 	}

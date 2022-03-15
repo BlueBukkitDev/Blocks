@@ -31,7 +31,7 @@ public class Graph extends UIObject {
 
 	private Color lineColor;
 
-	private double pointSpacing;
+	//private double pointSpacing;
 
 	private SP[] points;
 
@@ -39,13 +39,13 @@ public class Graph extends UIObject {
 
 	private boolean hovering;
 
-	private Button[] buttons;
+	//private Button[] buttons;
 
 	private TextArea infoPanel;
 
-	private boolean infoIsViewed;
+	//private boolean infoIsViewed;
 
-	private Button currentDot;
+	//private Button currentDot;
 
 	private Double[] values;
 
@@ -64,10 +64,10 @@ public class Graph extends UIObject {
 		this.infoPanel = new TextArea(app, "Info", x + width, animation.getY(), 1080 - x + width, animation.getHeight(), 0, null);
 		setupDefaultInfoPanel();
 		app.getUIRegistry().registerObject(this.infoPanel);
-		this.pointSpacing = (width - cushion * 2) / (values.length - 1);
-		double xCoord = cushion;
-		this.points = new SP[values.length];
-		this.buttons = new Button[values.length];
+		//this.pointSpacing = (width - cushion * 2) / (values.length - 1);
+		//double xCoord = cushion;
+		//this.points = new SP[values.length];
+		//this.buttons = new Button[values.length];
 		/*for (int i = 0; i < values.length; i++) {
 			YamlConfiguration yaml;
 			double yCoord = values[i].doubleValue() / peak * (height - cushion * 2);
@@ -251,7 +251,7 @@ public class Graph extends UIObject {
 		}
 	}
 
-	private void updateInfoPanel(Button button) {
+	/*private void updateInfoPanel(Button button) {
 		this.infoPanel.clear();
 		String[] parts = button.getId().split("§");
 		this.infoPanel.addLine(new TextBit[] {
@@ -260,7 +260,7 @@ public class Graph extends UIObject {
 				new TextBit(app, Color.ORANGE, new Font("Helvetica", 0, 18), "Date: " + parts[1], null, null) });
 		this.infoPanel.addLine(new TextBit[] {
 				new TextBit(app, Color.ORANGE, new Font("Helvetica", 0, 18), "Score: " + parts[2] + "%", null, null) });
-	}
+	}*/
 
 	public void render(Graphics g) {
 		animate();

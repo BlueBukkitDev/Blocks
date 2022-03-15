@@ -14,14 +14,14 @@ public class BitLine {
 
 	private int index;
 
-	private int width;
+	//private int width;
 
 	private int height;
 
-	private int maxWidth;
+	//private int maxWidth;
 
 	public BitLine(int maxWidth) {
-		this.maxWidth = maxWidth;
+		//this.maxWidth = maxWidth;
 		this.index = this.x;
 	}
 

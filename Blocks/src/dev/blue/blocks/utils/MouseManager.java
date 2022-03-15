@@ -105,7 +105,6 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 		app.getWindow().canvas.setCursor(new Cursor(Cursor.TEXT_CURSOR));
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void setNormalCursor() {
 		app.getWindow().canvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}

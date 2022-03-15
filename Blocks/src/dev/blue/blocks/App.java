@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 
+import dev.blue.blocks.utils.ConfigOptions;
 import dev.blue.blocks.utils.Fonts;
 import dev.blue.blocks.utils.KeyManager;
 import dev.blue.blocks.utils.MouseManager;
@@ -43,6 +44,7 @@ public class App implements Runnable {
 	private MouseManager mouseManager;
 	private Fonts fonts;
 	private UIObjectRegistry uiRegistry;
+	private ConfigOptions config;
 	
 	private Pattern msgFieldPattern;
 	private Pattern msgBoardPattern;
@@ -64,9 +66,9 @@ public class App implements Runnable {
 	private TextArea messageBoard;
 	private TextInputField messageField;
 	private TextInputField username;
-	private TextInputField ipTarget;
+	//private TextInputField ipTarget;
 	private NumberInputField portOut;
-	private NumberInputField portTarget;
+	//private NumberInputField portTarget;
 	private Button exitButton;
 	private Button resizeButton;
 	
@@ -88,6 +90,7 @@ public class App implements Runnable {
 		mouseManager = new MouseManager(this);
 		window = new Window(this, "App");
 		uiRegistry = new UIObjectRegistry();
+		config = new ConfigOptions();
 		
 		setupMeasurements();
 		
@@ -120,22 +123,28 @@ public class App implements Runnable {
 					messageBoard.logInfo("You must set a username at least 4 characters long");
 					return false;
 				}else {
-					client.sendMessage(username.getText()+">> "+this.getText());
+					client.sendMessage(username.getText()+" "+this.getText());
 					prefix = username.getText()+" ";
 					return true;
 				}
 			}
 		};
-		username = new TextInputField(this, "username", spacer, profileHeight-(2*msgFieldHeight)-spacer+cbW, (msgMenuWidth-(spacer*2))/3*2, msgFieldHeight, "username", "", true, false, null, usernamePattern) {
-			
+		username = new TextInputField(this, "username", spacer, profileHeight-msgFieldHeight-spacer+cbW, (msgMenuWidth-(spacer*2))/3*2, msgFieldHeight, "username", config.getUsername(), true, false, null, usernamePattern) {
+			@Override
+			public boolean onPrint() {
+				if(getText().length() >= 4) {
+					config.setUsername(getText());
+					return false;
+				}
+				return false;
+			}
 		};
-		portOut = new NumberInputField(this, "portOut", username.getX()+username.getWidth()+spacer, username.getY(), username.getWidth()/2-spacer, username.getHeight(), "port", "", true, false, null, portOutPattern) {
+		portOut = new NumberInputField(this, "portOut", username.getX()+username.getWidth()+spacer, username.getY(), username.getWidth()/2-spacer, username.getHeight(), "port", ""+config.getPort(), true, false, null, portOutPattern) {
 			
 		};
 		setupCornerButtons();
 		setupGraphics();
 		/*ipTarget;
-		portOut;
 		portTarget;*/
 		
 		setupCornerButtonPatterns();

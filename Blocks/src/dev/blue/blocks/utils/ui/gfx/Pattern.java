@@ -4,8 +4,6 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.blue.blocks.utils.ui.UIObject;
-
 public class Pattern {
 	List<Shape> shapes;
 	public Pattern() {

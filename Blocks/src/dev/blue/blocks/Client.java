@@ -15,7 +15,7 @@ public class Client {
 
 	public Client() {
 		try {
-			address = InetAddress.getByName("localhost");
+			address = InetAddress.getByName("64.130.154.189");
 			socket = new DatagramSocket();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
