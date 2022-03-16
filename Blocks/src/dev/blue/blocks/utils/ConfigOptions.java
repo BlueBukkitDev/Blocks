@@ -31,7 +31,7 @@ public class ConfigOptions {
 			System.out.println("Could not read from blocks.cfg file");
 			return;
 		}
-		for(index = 0; index <= options.size(); index++){
+		for(index = 0; index < options.size(); index++){
 			options.set(index, lines.get(index).split(":")[1]);
 		}
 		if (options.size() == 0) {

@@ -119,7 +119,7 @@ public class App implements Runnable {
 		messageField = new TextInputField(this, "message", msgMenuWidth+spacer, bottom-msgFieldHeight, right-msgMenuWidth-spacer, msgFieldHeight, "Send a message...", "", true, false, messageBoard, msgFieldPattern) {
 			@Override
 			public boolean onPrint() {
-				if(username.getText().length() <= 4) {
+				if(username.getText().length() < 4) {
 					messageBoard.logInfo("You must set a username at least 4 characters long");
 					return false;
 				}else {
