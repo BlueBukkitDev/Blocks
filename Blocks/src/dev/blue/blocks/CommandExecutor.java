@@ -4,10 +4,8 @@ public class CommandExecutor {
 	
 	private Block currentBlock;
 	
-	App app;
-	
-	public CommandExecutor (App app) {
-		this.app = app;
+	public CommandExecutor () {
+		
 	}
 	
 	public boolean execute(String[] args) {
@@ -40,7 +38,7 @@ public class CommandExecutor {
 		for(int i = 1; i < args.length; i++) {
 			message += args[i];
 		}
-		app.sendMessage(message);
+		//app.sendMessage(message);
 	}
 	
 	private void runCreateArg(String[] args) {
