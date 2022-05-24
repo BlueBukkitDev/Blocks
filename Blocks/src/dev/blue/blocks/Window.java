@@ -30,10 +30,10 @@ public class Window extends JFrame {
 		setupWindowDimensions();
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setLocationRelativeTo(null);
 		WindowLayoutController controller = new WindowLayoutController(this);
 		controller.setLayout(WindowLayoutController.LOGIN_PAGE_LAYOUT);
 		this.pack();
+		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
 	
