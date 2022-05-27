@@ -11,23 +11,15 @@ import java.util.List;
 public class ConfigOptions {
 
 	private List<String> options = new ArrayList<String>();
-	//username
-	//port
-	//
-	//
-	//
-	//
-	//
+	private List<Profile> profiles = new ArrayList<Profile>();
 
 	public ConfigOptions() throws IndexOutOfBoundsException, ArrayIndexOutOfBoundsException, NumberFormatException {
 		initConfig();//Checks if the file exists; if not, creates it. 
-		options.add(0, "");
-		options.add(1, "");
 		int index = 0;
 		List<String> lines = new ArrayList<String>();
 		try {
 			lines = Files.readAllLines(Paths.get("blocks.cfg"));
-		} catch (IOException e1) {
+		} catch (IOException e) {
 			System.out.println("Could not read from blocks.cfg file");
 			return;
 		}
@@ -47,6 +39,10 @@ public class ConfigOptions {
 		return Integer.parseInt(options.get(1));
 	}
 	
+	public String getPassword() {
+		return options.get(2);
+	}
+	
 	public void setUsername(String username) {
 		options.set(0, username);
 	}
@@ -55,16 +51,50 @@ public class ConfigOptions {
 		options.set(1, port);
 	}
 	
+	public void setPassword(String password) {
+		options.set(2, password);
+	}
+	
 	private void initConfig() {
 		if (!new File("blocks.cfg").exists()) {
 			FileWriter writer;
 			try {
 				writer = new FileWriter("blocks.cfg");
-				writer.write("username:default" + System.lineSeparator());
-				writer.write("port:45225" + System.lineSeparator());
+				writer.write("profile:default" + System.lineSeparator());//This will work for now but we will want to use snakeYaml later. 
+				writer.write("default:username:user" + System.lineSeparator());
+				writer.write("default:port:45225" + System.lineSeparator());
+				writer.write("default:password:password");
 				writer.close();
 			} catch (IOException e) {
 				System.out.println("Unable to setup config file");
+			}
+		}
+	}
+	
+	public void getAllProfiles() {
+		List<Profile> profiles = new ArrayList<Profile>();
+		for(int i = 0; i < options.size(); i++) {
+			if(options.get(i).startsWith("profile")) {
+				String profile = options.get(i).split(":")[1];//profile:smth//smth:username:user
+				String username = "";
+				String password = "";
+				int port = 1;
+				for(String each:options) {
+					if(each.startsWith(profile)) {
+						String type = each.split(":")[1];
+						String value = each.split(":")[2];
+						if(type.equalsIgnoreCase("username")) {
+							username = value;
+						}
+						if(type.equalsIgnoreCase("password")) {
+							password = value;
+						}
+						if(type.equalsIgnoreCase("port")) {
+							port = Integer.parseInt(value);
+						}
+					}
+				}
+				profiles.add(new Profile(profile, username, password, port));
 			}
 		}
 	}
